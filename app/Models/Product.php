@@ -28,4 +28,8 @@ class Product extends Model
         $product->save();
         return $product;
     }
+
+    public function images(){
+        return $this->hasMany('App\Models\ProductImage');
+    }
 }

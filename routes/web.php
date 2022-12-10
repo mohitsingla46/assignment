@@ -19,3 +19,4 @@ Route::get('get_products', [ProductController::class, 'get_products']);
 Route::post('save_product', [ProductController::class, 'save_product']);
 Route::delete('delete_product/{product_id}', [ProductController::class, 'delete_product']);
 Route::get('edit_product/{product_id}', [ProductController::class, 'edit_product']);
+Route::delete('delete_image/{image_id}', [ProductController::class, 'delete_image']);

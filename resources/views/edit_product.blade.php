@@ -3,8 +3,9 @@
     <div class="col-6">
         <br>
         <div class="general_err"></div>
-        <form method="post" id="add_product_form">
+        <form method="post" id="edit_product_form">
             {{ csrf_field() }}
+            <input type="hidden" name="product_id" value="{{$product->id}}">
             <div class="mb-3">
                 <label for="product_name" class="form-label">Product Name</label>
                 <input type="text" class="form-control" id="product_name" name="product_name" value="{{$product->product_name}}" required>
@@ -25,6 +26,14 @@
                 <label for="product_images" class="form-label">Images</label>
                 <input type="file" class="form-control" id="product_images" name="product_images[]" multiple>
                 <div class="product_images_err"></div>
+            </div>
+            <div class="mb-3">
+                @foreach($product->images as $image)
+                    <div class="img_{{$image->id}}">
+                        <img src="{{$image->image}}" alt="image" width="150" height="auto">
+                        <a href="javascript:" onclick="delete_image({{$image->id}})">Delete Image</a>
+                    </div>
+                @endforeach
             </div>
             <input type="submit" class="btn btn-primary submit_btn" value="Submit">
         </form>

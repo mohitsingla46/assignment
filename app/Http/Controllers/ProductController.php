@@ -21,10 +21,11 @@ class ProductController extends Controller
 
     public function save_product(Request $request){
         $validator = Validator::make($request->all(), [
+            'product_id' => 'nullable',
             'product_name' => 'required|max:255',
             'product_price' => 'required',
             'product_desccription' => 'required',
-            'product_images' => 'required',
+            'product_images' => 'nullable',
         ]);
         if($validator->fails()) {
             return response()->json([
@@ -34,12 +35,15 @@ class ProductController extends Controller
         }
         try{
             $data = $request->all();
-            $saved = Product::createOrUpdate($data);
-            \Log::info($data);
-            foreach($data['product_images'] as $product_image){
-                $p_image['product_id'] = $saved->id;
-                $p_image['image'] = $product_image->store('products');
-                ProductImage::createOrUpdate($p_image);
+            $product_id = $data['product_id'] ?? null;
+            $product = Product::where('id', $product_id)->first();
+            $saved = Product::createOrUpdate($data, $product);
+            if(isset($data['product_images'])){
+                foreach($data['product_images'] as $product_image){
+                    $p_image['product_id'] = $saved->id;
+                    $p_image['image'] = $product_image->store('products');
+                    ProductImage::createOrUpdate($p_image);
+                }
             }
             return response()->json([
                 'status' => true
@@ -62,8 +66,12 @@ class ProductController extends Controller
     }
 
     public function edit_product($product_id){
-        $product = Product::where('id', $product_id)->first();
+        $product = Product::with('images')->where('id', $product_id)->first();
         $returnHTML = view('edit_product')->with('product', $product)->render();
         return response()->json(array('success' => true, 'html'=>$returnHTML));
+    }
+
+    public function delete_image($image_id){
+        ProductImage::where('id', $image_id)->delete();
     }
 }

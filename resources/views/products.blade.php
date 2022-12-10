@@ -138,6 +138,11 @@
                         $(".product_list_block").show();
                         $(".add_product_block").hide();
                         loadProducts();
+                        $(".general_err").html("");
+                        $(".product_name_err").html("");
+                        $(".product_price_err").html("");
+                        $(".product_desccription_err").html("");
+                        $(".product_images_err").html("");
                     }
                 }
             });
@@ -174,6 +179,64 @@
             $(".add_product_block").hide();
             $(".edit_product_block").hide();
             loadProducts();
+        }
+
+        $(document).on('submit', '#edit_product_form', function(e){
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: "{{ url('save_product') }}",
+                type:'POST',
+                data:formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    if(data.status == false){
+                        let errors = data.errors;
+                        if (typeof errors.product_name !== 'undefined') {
+                            $(".product_name_err").html('<div class="alert alert-danger" role="alert">'+errors.product_name[0]+'</div>');
+                        }
+                        if (typeof errors.product_price !== 'undefined') {
+                            $(".product_price_err").html('<div class="alert alert-danger" role="alert">'+errors.product_price[0]+'</div>');
+                        }
+                        if (typeof errors.product_desccription !== 'undefined') {
+                            $(".product_desccription_err").html('<div class="alert alert-danger" role="alert">'+errors.product_desccription[0]+'</div>');
+                        }
+                        if (typeof errors.product_images !== 'undefined') {
+                            $(".product_images_err").html('<div class="alert alert-danger" role="alert">'+errors.product_images[0]+'</div>');
+                        }
+                        if (typeof errors.general !== 'undefined') {
+                            $(".general_err").html('<div class="alert alert-danger" role="alert">'+errors.general+'</div>');
+                        }
+                    }
+                    else{
+                        $("#product_name").val('');
+                        $("#product_price").val('');
+                        $("#product_desccription").val('');
+                        $("#product_images").val('');
+                        $(".product_list_block").show();
+                        $(".edit_product_block").hide();
+                        loadProducts();
+                        $(".general_err").html("");
+                        $(".product_name_err").html("");
+                        $(".product_price_err").html("");
+                        $(".product_desccription_err").html("");
+                        $(".product_images_err").html("");
+                    }
+                }
+            });
+        });
+
+        function delete_image(image_id){
+            $.ajax({
+                url: "{{ url('delete_image') }}"+"/"+image_id,
+                type: 'DELETE',
+                data: {_token:'{{csrf_token()}}'},
+                success: function(data) {
+                    $(".img_"+image_id).remove();
+                }
+            });
         }
     </script>
 </body>
